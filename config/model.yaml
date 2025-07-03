@@ -1,0 +1,6 @@
+model_type: "logistic_regression"
+vectorizer: "tfidf"
+max_features: 10000
+test_size: 0.2
+random_state: 42
+tracking_uri: "http://localhost:5000"

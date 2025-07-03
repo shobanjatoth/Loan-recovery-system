@@ -1,0 +1,53 @@
+loan_recovery:
+  required_columns:
+    - Age
+    - Gender
+    - Employment_Type
+    - Monthly_Income
+    - Num_Dependents
+    - Loan_Amount
+    - Loan_Tenure
+    - Interest_Rate
+    - Collateral_Value
+    - Outstanding_Loan_Amount
+    - Monthly_EMI
+    - Payment_History
+    - Num_Missed_Payments
+    - Days_Past_Due
+    - Collection_Attempts
+    - Collection_Method
+    - Legal_Action_Taken
+
+  column_dtypes:
+    Age: int
+    Gender: str
+    Employment_Type: str
+    Monthly_Income: float
+    Num_Dependents: int
+    Loan_Amount: float
+    Loan_Tenure: int
+    Interest_Rate: float
+    Collateral_Value: float
+    Outstanding_Loan_Amount: float
+    Monthly_EMI: float
+    Payment_History: str
+    Num_Missed_Payments: int
+    Days_Past_Due: int
+    Collection_Attempts: int
+    Collection_Method: str
+    Legal_Action_Taken: str
+
+  target_column: Recovery_Status
+
+  dropped_columns:
+    - Borrower_ID
+    - Loan_ID
+    - Loan_Type
+
+
+
+
+
+
+
+

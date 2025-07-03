@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loan Recovery System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 30px;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .result, .error {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 15px;
+            font-size: 1.1em;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .result { background-color: #e6ffed; color: #0c6831; }
+        .error { background-color: #ffe6e6; color: #a94442; }
+    </style>
+</head>
+<body>
+
+    <h2>Loan Recovery System</h2>
+
+    <form action="/predict" method="post">
+
+        <label>Age</label>
+        <input type="number" name="Age" required>
+
+        <label>Gender</label>
+        <select name="Gender" required>
+            <option value="">-- Select Gender --</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+
+        <label>Employment Type</label>
+        <select name="Employment_Type" required>
+            <option value="">-- Select Employment Type --</option>
+            <option value="Salaried">Salaried</option>
+            <option value="Self-Employed">Self-Employed</option>
+            <option value="Business Owner">Business Owner</option>
+        </select>
+
+        <label>Monthly Income</label>
+        <input type="number" step="0.01" name="Monthly_Income" required>
+
+        <label>Number of Dependents</label>
+        <input type="number" name="Num_Dependents" required>
+
+        <label>Loan Amount</label>
+        <input type="number" step="0.01" name="Loan_Amount" required>
+
+        <label>Loan Tenure (months)</label>
+        <input type="number" name="Loan_Tenure" required>
+
+        <label>Interest Rate (%)</label>
+        <input type="number" step="0.01" name="Interest_Rate" required>
+
+        <label>Collateral Value</label>
+        <input type="number" step="0.01" name="Collateral_Value" required>
+
+        <label>Outstanding Loan Amount</label>
+        <input type="number" step="0.01" name="Outstanding_Loan_Amount" required>
+
+        <label>Monthly EMI</label>
+        <input type="number" step="0.01" name="Monthly_EMI" required>
+
+        <label>Payment History</label>
+        <select name="Payment_History" required>
+            <option value="">-- Select Payment History --</option>
+            <option value="On-Time">On-Time</option>
+            <option value="Delayed">Delayed</option>
+            <option value="Missed">Missed</option>
+        </select>
+
+        <label>Number of Missed Payments</label>
+        <input type="number" name="Num_Missed_Payments" required>
+
+        <label>Days Past Due</label>
+        <input type="number" name="Days_Past_Due" required>
+
+        <label>Collection Attempts</label>
+        <input type="number" name="Collection_Attempts" required>
+
+        <label>Collection Method</label>
+        <select name="Collection_Method" required>
+            <option value="">-- Select Method --</option>
+            <option value="Settlement Offer">Settlement Offer</option>
+            <option value="Legal Notice">Legal Notice</option>
+            <option value="Calls">Calls</option>
+            <option value="Debt Collectors">Debt Collectors</option>
+        </select>
+
+        <label>Legal Action Taken</label>
+        <select name="Legal_Action_Taken" required>
+            <option value="">-- Select --</option>
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+        </select>
+
+        <button type="submit">Predict Risk</button>
+    </form>
+
+    {% if prediction %}
+    <div class="result">
+        <p><strong>Risk Score:</strong> {{ prediction['Risk_Score'] }}</p>
+        <p><strong>Predicted High Risk:</strong> {{ 'Yes' if prediction['Predicted_High_Risk'] else 'No' }}</p>
+        <p><strong>Recovery Strategy:</strong> {{ prediction['Recovery_Strategy'] }}</p>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error">
+        <p>Error: {{ error }}</p>
+    </div>
+    {% endif %}
+
+</body>
+</html>
+
+
