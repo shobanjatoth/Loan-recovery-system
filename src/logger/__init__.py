@@ -1,20 +1,25 @@
 import logging
 import os
 from datetime import datetime
-from from_root import from_root  # assuming this resolves root path correctly
 
-LOG_FILE = f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S')}.log"
 
-log_dir = 'logs'
-logs_path = os.path.join(from_root(), log_dir, LOG_FILE)
+# Constants
+LOG_DIR = "logs"
+LOG_FILE = "app.log"
 
-os.makedirs(log_dir, exist_ok=True)
+# Ensure log directory exists (even in Docker)
+os.makedirs(LOG_DIR, exist_ok=True)
 
+# Final log file path
+LOG_PATH = os.path.join(LOG_DIR, LOG_FILE)
+
+# Basic configuration
 logging.basicConfig(
-    filename=logs_path,
-    format="[ %(asctime)s ] %(name)s - %(levelname)s - %(message)s",
-    level=logging.DEBUG,
+    filename=LOG_PATH,
+    filemode="a",
+    format="%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] - %(message)s",
+    level=logging.INFO
 )
 
-# ✅ Define a logger object to import elsewhere
-logger = logging.getLogger(__name__)
+# You can now use: from src.logger import logging
+
