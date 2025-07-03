@@ -9,4 +9,5 @@ python-dotenv
 PyYAML
 pymongo
 requests
+from-root
 -e .
