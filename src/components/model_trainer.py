@@ -1,6 +1,8 @@
 import os
 import sys
 import numpy as np
+import mlflow
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, roc_auc_score
@@ -34,10 +36,12 @@ class ModelTrainer:
             )
 
             logging.info("🌲 Training RandomForestClassifier")
-            model = RandomForestClassifier(n_estimators=100,
-                                             max_depth=5,  
-                                             min_samples_leaf=10,
-                                                  random_state=42)
+            model = RandomForestClassifier(
+                n_estimators=100,
+                max_depth=5,
+                min_samples_leaf=10,
+                random_state=42
+            )
             model.fit(X_train, y_train)
 
             logging.info("🧪 Evaluating model on test set")
@@ -50,23 +54,36 @@ class ModelTrainer:
             logging.info(f"✅ Accuracy: {accuracy:.4f}")
             logging.info(f"✅ ROC-AUC: {roc_auc:.4f}")
 
-            # Save model
-            model_path = self.model_trainer_config.model_path
-            save_object(model_path, model)
-            logging.info(f"📦 Model saved at: {model_path}")
+            # Save model and test array
+            save_object(self.model_trainer_config.model_path, model)
+            np.save(self.model_trainer_config.test_array_path, np.c_[X_test, y_test])
 
-            # Save test set for evaluation
-            test_array_path = self.model_trainer_config.test_array_path
-            np.save(test_array_path, np.c_[X_test, y_test])
-            logging.info(f"🧪 Test array saved at: {test_array_path}")
+            logging.info(f"📦 Model saved to: {self.model_trainer_config.model_path}")
+            logging.info(f"🧪 Test array saved to: {self.model_trainer_config.test_array_path}")
+
+            # ✅ Log to MLflow (params + metrics)
+            mlflow.log_param("model_type", "RandomForest")
+            mlflow.log_param("n_estimators", 100)
+            mlflow.log_param("max_depth", 5)
+            mlflow.log_param("min_samples_leaf", 10)
+
+            mlflow.log_metric("accuracy", accuracy)
+            mlflow.log_metric("roc_auc", roc_auc)
+
+            # ✅ Manually upload model as artifact (safe for DagsHub)
+            mlflow.log_artifact(self.model_trainer_config.model_path, artifact_path="model_artifacts")
 
             return ModelTrainerArtifact(
-                model_path=model_path,
-                test_array_path=test_array_path,
+                model_path=self.model_trainer_config.model_path,
+                test_array_path=self.model_trainer_config.test_array_path,
                 accuracy=accuracy,
                 roc_auc=roc_auc
             )
 
         except Exception as e:
             raise USvisaException(e, sys)
+
+
+
+
 

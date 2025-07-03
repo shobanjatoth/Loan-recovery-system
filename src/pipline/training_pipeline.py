@@ -1,7 +1,6 @@
-# === training_pipeline.py ===
-
 import os
 import sys
+import mlflow
 
 from src.entity.config_entity import (
     DataIngestionConfig,
@@ -36,16 +35,18 @@ class TrainPipeline:
         try:
             logging.info("🚀 Initializing TrainPipeline")
 
-            # Initialize base pipeline config
+            # ✅ MLflow setup (only once)
+            mlflow.set_tracking_uri("https://dagshub.com/shobanjatoth/News-dashboard-MLops.mlflow")
+            mlflow.set_experiment("LoanRecoveryExperiment")
+
+            # Pipeline configs
             self.training_pipeline_config = TrainingPipelineConfig()
 
-            # Initialize component configs
             self.data_ingestion_config = DataIngestionConfig(self.training_pipeline_config)
             self.data_validation_config = DataValidationConfig(self.training_pipeline_config)
             self.data_transformation_config = DataTransformationConfig(self.training_pipeline_config)
             self.model_trainer_config = ModelTrainerConfig(self.training_pipeline_config)
 
-            # Evaluation config with path to YAML
             model_eval_dir = os.path.join(self.training_pipeline_config.artifact_dir, "model_evaluation")
             report_path = os.path.join(model_eval_dir, MODEL_EVALUATION_FILE_NAME)
             self.model_evaluation_config = ModelEvaluationConfig(report_file_path=report_path)
@@ -90,34 +91,32 @@ class TrainPipeline:
         try:
             logging.info("🏁 Pipeline execution started")
 
-            # 1. Data ingestion
-            ingestion_artifact = self.start_data_ingestion()
+            # ✅ Start MLflow run for entire pipeline
+            with mlflow.start_run(run_name="LoanRecoveryPipeline"):
+                ingestion_artifact = self.start_data_ingestion()
 
-            # 2. Data validation
-            validation_artifact = self.start_data_validation(ingestion_artifact)
-            if not validation_artifact.validation_status:
-                raise Exception("❌ Data validation failed. Stopping pipeline.")
+                validation_artifact = self.start_data_validation(ingestion_artifact)
+                if not validation_artifact.validation_status:
+                    raise Exception("❌ Data validation failed. Stopping pipeline.")
 
-            # 3. Data transformation
-            transformation_artifact = self.start_data_transformation(ingestion_artifact)
-            logging.info(f"✅ Data transformation completed.")
+                transformation_artifact = self.start_data_transformation(ingestion_artifact)
+                logging.info(f"✅ Data transformation completed.")
 
-            # 4. Inject dynamic .npy path into trainer config
-            self.model_trainer_config.transformed_train_file_path = transformation_artifact.transformed_train_file_path
+                self.model_trainer_config.transformed_train_file_path = transformation_artifact.transformed_train_file_path
 
-            # 5. Model training
-            model_trainer_artifact = self.start_model_training()
-            logging.info(f"✅ Model training completed.")
+                model_trainer_artifact = self.start_model_training()
+                logging.info(f"✅ Model training completed.")
 
-            # 6. Model evaluation
-            evaluation_artifact = self.start_model_evaluation(
-                model_trainer_artifact=model_trainer_artifact,
-                data_transformation_artifact=transformation_artifact
-            )
-            logging.info(f"📄 Evaluation Report: {evaluation_artifact}")
+                evaluation_artifact = self.start_model_evaluation(
+                    model_trainer_artifact=model_trainer_artifact,
+                    data_transformation_artifact=transformation_artifact
+                )
+                logging.info(f"📄 Evaluation Report: {evaluation_artifact}")
 
         except Exception as e:
             raise USvisaException(e, sys)
+
+
 
 
 
