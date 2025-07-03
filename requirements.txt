@@ -1,31 +1,12 @@
-
-# NLP & Transformers
-transformers
-torch
-
-
-# LLM Integration
-openai
-tiktoken
-
-# Dashboard
-streamlit
-plotly
-geopy
-
-# MLflow & Experiment Tracking
+flask
+gunicorn
+scikit-learn
+numpy
+pandas
+joblib
 mlflow
-psycopg2-binary
-
-# Vector Search (for chatbot)
-faiss-cpu
-langchain
-
-# Logging and Exception Handling
-loguru
-
-# Misc
 python-dotenv
-
-# Local Editable Install
+PyYAML
+pymongo
+requests
 -e .
